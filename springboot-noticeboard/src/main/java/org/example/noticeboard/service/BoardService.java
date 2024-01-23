@@ -10,7 +10,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,8 +22,16 @@ import java.util.Optional;
 public class BoardService {
     private final BoardRepository boardRepository;
 
-    public void save(BoardDTO boardDTO) {
-        boardRepository.save(BoardEntity.toSaveEntity(boardDTO));
+    public void save(BoardDTO boardDTO) throws IOException {
+        if (boardDTO.getBoardFile().isEmpty()) {
+            boardRepository.save(BoardEntity.toSaveEntity(boardDTO));
+        } else {
+            MultipartFile boardFile = boardDTO.getBoardFile();
+            String originalFileName = boardFile.getOriginalFilename();
+            String storedFileName = System.currentTimeMillis() + "_" + originalFileName;
+            String savePath = "C:/springbootBoardImage/" + storedFileName;
+            boardFile.transferTo(new File(savePath));
+        }
     }
 
     public List<BoardDTO> findAll() {
