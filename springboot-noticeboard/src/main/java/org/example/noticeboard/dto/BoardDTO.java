@@ -2,9 +2,12 @@ package org.example.noticeboard.dto;
 
 import lombok.*;
 import org.example.noticeboard.entity.BoardEntity;
+import org.example.noticeboard.entity.BoardFileEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,9 +24,9 @@ public class BoardDTO {
     private LocalDateTime boardCreatedTime;
     private LocalDateTime boardUpdatedTime;
 
-    private MultipartFile boardFile;
-    private String originalFileName;
-    private String storedFileName;
+    private List<MultipartFile> boardFile;
+    private List<String> originalFileName;
+    private List<String> storedFileName;
     private int fileAttached;
 
     public BoardDTO(Long id, String boardWriter, String boardTitle, int boardHits, LocalDateTime boardCreatedTime) {
@@ -44,6 +47,17 @@ public class BoardDTO {
         boardDTO.setBoardHits(boardEntity.getBoardHits());
         boardDTO.setBoardCreatedTime(boardEntity.getCreatedTime());
         boardDTO.setBoardUpdatedTime(boardEntity.getUpdatedTime());
+        boardDTO.setFileAttached(boardEntity.getFileAttached());
+        if (boardEntity.getFileAttached() != 0) {
+            List<String> originalFileNameList = new ArrayList<>();
+            List<String> storedFileNameList = new ArrayList<>();
+            for (BoardFileEntity boardFileEntity : boardEntity.getBoardFileEntityList()) {
+                originalFileNameList.add(boardFileEntity.getOriginalFileName());
+                storedFileNameList.add(boardFileEntity.getStoredFileName());
+            }
+            boardDTO.setOriginalFileName(originalFileNameList);
+            boardDTO.setStoredFileName(storedFileNameList);
+        }
         return boardDTO;
     }
 }
