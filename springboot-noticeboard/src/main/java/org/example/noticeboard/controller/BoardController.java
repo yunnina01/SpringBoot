@@ -2,7 +2,9 @@ package org.example.noticeboard.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.noticeboard.dto.BoardDTO;
+import org.example.noticeboard.dto.CommentDTO;
 import org.example.noticeboard.service.BoardService;
+import org.example.noticeboard.service.CommentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -18,6 +20,7 @@ import java.util.List;
 @RequestMapping("/board")
 public class BoardController {
     private final BoardService boardService;
+    private final CommentService commentService;
 
     @GetMapping("/save")
     public String saveForm() {
@@ -41,8 +44,10 @@ public class BoardController {
     public String findById(@PathVariable Long id, Model model, @PageableDefault(page=1) Pageable pageable) {
         boardService.updateHits(id);
         BoardDTO boardDTO = boardService.findById(id);
+        List<CommentDTO> commentDTOList = commentService.findAll(id);
         model.addAttribute("board", boardDTO);
         model.addAttribute("page", pageable.getPageNumber());
+        model.addAttribute("commentList", commentDTOList);
         return "detail";
     }
 
